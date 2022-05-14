@@ -21,7 +21,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	int foodEaten;
 	int foodX;
 	int foodY;
-	char direction = 'D';
+	public char direction = 'D';
 	boolean isRunning = false;
 	Timer timer;
 	Random random;
@@ -134,10 +134,32 @@ public class GamePanel extends JPanel implements ActionListener {
 		repaint();
 	}
 
-	public static class MyKeyAdapter extends KeyAdapter {
+	public class MyKeyAdapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e) {
+			switch (e.getKeyCode()) {
+				case KeyEvent.VK_LEFT:
+					if (direction != 'D') {
+						direction = 'A';
+					}
+					break;
+				case KeyEvent.VK_RIGHT:
+					if (direction != 'A') {
+						direction = 'D';
+					}
+					break;
+				case KeyEvent.VK_UP:
+					if (direction != 'S') {
+						direction = 'W';
+					}
+					break;
+				case KeyEvent.VK_DOWN:
+					if (direction != 'W') {
+						direction = 'S';
+					}
+					break;
 
+			}
 		}
 	}
 
