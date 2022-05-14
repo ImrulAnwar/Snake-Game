@@ -21,8 +21,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	int foodEaten;
 	int foodX;
 	int foodY;
-	char direction = 'R';
-	boolean running = false;
+	char direction = 'D';
+	boolean isRunning = false;
 	Timer timer;
 	Random random;
 
@@ -37,7 +37,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void startGame() {
 		newFood();
-		running = true;
+		isRunning = true;
 		timer = new Timer(DELAY, this);
 		timer.start();
 	}
@@ -49,11 +49,23 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void draw(Graphics graphics) {
 		for (int i = 0; i < SCREEN_HEIGHT / UNIT_SIZE; i++) {
-			graphics.drawLine(i*UNIT_SIZE, 0, i*UNIT_SIZE, SCREEN_HEIGHT);
-			graphics.drawLine(0, i*UNIT_SIZE, SCREEN_WIDTH, i*UNIT_SIZE);
+			graphics.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, SCREEN_HEIGHT);
+			graphics.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE);
 		}
+		//food
 		graphics.setColor(Color.WHITE);
 		graphics.fillOval(foodX, foodY, UNIT_SIZE, UNIT_SIZE);
+
+		//snake body
+		for (int i = 0; i < bodyParts; i++) {
+			if (i == 0) {
+				graphics.setColor(Color.DARK_GRAY);
+				graphics.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+			} else {
+				graphics.setColor(Color.LIGHT_GRAY);
+				graphics.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+			}
+		}
 	}
 
 	public void newFood() {
@@ -62,7 +74,16 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void move() {
-
+		for (int i = bodyParts; i > 0; i--) {
+			x[i] = x[i - 1];
+			y[i] = y[i - 1];
+		}
+		switch (direction) {
+			case 'W' -> y[0] = y[0] - UNIT_SIZE;
+			case 'S' -> y[0] = y[0] + UNIT_SIZE;
+			case 'A' -> x[0] = x[0] - UNIT_SIZE;
+			case 'D' -> x[0] = x[0] + UNIT_SIZE;
+		}
 	}
 
 	public void checkFood() {
@@ -70,6 +91,32 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void checkCollisions() {
+		//checks if head collides with body
+		for (int i = bodyParts; i > 0; i--) {
+			if ((x[0] == x[i]) && (y[0] == y[i])) {
+				isRunning = false;
+				break;
+			}
+		}
+		//if head touches left border
+		if (x[0] < 0) {
+			isRunning = false;
+		}
+		//if head touches right border
+		if (x[0] > SCREEN_WIDTH) {
+			isRunning = false;
+		}
+		//if head touches top border
+		if (y[0] < 0) {
+			isRunning = false;
+		}
+		//if head touches bottom border
+		if (y[0] > SCREEN_HEIGHT) {
+			isRunning = false;
+		}
+		if (!isRunning) {
+			timer.stop();
+		}
 
 	}
 
@@ -79,7 +126,12 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
+		if (isRunning) {
+			move();
+			checkFood();
+			checkCollisions();
+		}
+		repaint();
 	}
 
 	public static class MyKeyAdapter extends KeyAdapter {
