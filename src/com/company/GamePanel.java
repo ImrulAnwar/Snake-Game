@@ -14,7 +14,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	static final int SCREEN_HEIGHT = 600;
 	static final int UNIT_SIZE = 25;
 	static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
-	static final int DELAY = 75;
+	static final int DELAY = 50;
 	final int[] x = new int[GAME_UNITS];
 	final int[] y = new int[GAME_UNITS];
 	int bodyParts = 6;
@@ -48,24 +48,27 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void draw(Graphics graphics) {
-		for (int i = 0; i < SCREEN_HEIGHT / UNIT_SIZE; i++) {
-			graphics.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, SCREEN_HEIGHT);
-			graphics.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE);
-		}
-		//food
-		graphics.setColor(Color.WHITE);
-		graphics.fillOval(foodX, foodY, UNIT_SIZE, UNIT_SIZE);
+		if (isRunning) {
+			//food
+			graphics.setColor(Color.WHITE);
+			graphics.fillOval(foodX, foodY, UNIT_SIZE, UNIT_SIZE);
 
-		//snake body
-		for (int i = 0; i < bodyParts; i++) {
-			if (i == 0) {
-				graphics.setColor(Color.DARK_GRAY);
-				graphics.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
-			} else {
-				graphics.setColor(Color.LIGHT_GRAY);
-				graphics.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+			//snake body
+			for (int i = 0; i < bodyParts; i++) {
+					graphics.setColor(Color.LIGHT_GRAY);
+					graphics.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
 			}
+			showScore(graphics);
+		} else {
+			gameOver(graphics);
 		}
+	}
+
+	private void showScore(Graphics graphics) {
+		graphics.setColor(Color.RED);
+		graphics.setFont(new Font("Poppins", Font.BOLD, 45));
+		FontMetrics metrics = getFontMetrics(graphics.getFont());
+		graphics.drawString("Score: "+foodEaten, (SCREEN_WIDTH-metrics.stringWidth("Score: "+foodEaten))/2, graphics.getFont().getSize());
 	}
 
 	public void newFood() {
@@ -125,7 +128,11 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void gameOver(Graphics graphics) {
-
+		graphics.setColor(Color.RED);
+		graphics.setFont(new Font("Poppins", Font.BOLD, 75));
+		FontMetrics metrics = getFontMetrics(graphics.getFont());
+		graphics.drawString("Game Over", (SCREEN_WIDTH-metrics.stringWidth("Game Over"))/2, SCREEN_HEIGHT/2);
+		showScore(graphics);
 	}
 
 	@Override
